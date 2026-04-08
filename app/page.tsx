@@ -127,10 +127,14 @@ export default function Home() {
   }, [])
 
   return (
-    <div className={`${inter.variable} min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600 p-4 font-sans`}>
+    <div className={`${inter.variable} min-h-screen flex items-center justify-center p-4 font-sans`} style={{ background: '#18181B' }}>
       <div className="w-full max-w-[400px]">
         {/* 天气卡片 */}
-        <div className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-[16px] shadow-2xl p-[32px] text-white relative overflow-hidden" style={{ width: '400px', height: '400px' }}>
+        <div className="rounded-[16px] shadow-2xl p-[32px] text-white relative overflow-hidden" style={{
+          width: '400px',
+          height: '400px',
+          background: `linear-gradient(to bottom, #3A3D35 0%, #2D3028 33%, #1E211A 66%, #1C1F17 100%)`
+        }}>
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
