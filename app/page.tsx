@@ -1,6 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Inter from 'next/font/google'
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 interface WeatherData {
   current: {
@@ -82,6 +85,11 @@ function getUVLevel(uv: number): string {
   return '极强'
 }
 
+function isRainy(code: number): boolean {
+  // 雨天气代码：51-55, 61-65, 80-82
+  return (code >= 51 && code <= 55) || (code >= 61 && code <= 65) || (code >= 80 && code <= 82)
+}
+
 export default function Home() {
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -115,19 +123,19 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600 p-4">
-      <div className="w-full max-w-md">
+    <div className={`${inter.variable} min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600 p-4 font-sans`}>
+      <div className="w-full max-w-[400px]">
         {/* 天气卡片 */}
-        <div className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl shadow-2xl p-8 text-white">
+        <div className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-[16px] shadow-2xl p-[32px] text-white relative overflow-hidden" style={{ width: '400px', height: '400px' }}>
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
-              <p className="mt-4 text-lg">加载中...</p>
+              <p className="mt-4 text-[18px] font-semibold">加载中...</p>
             </div>
           ) : error ? (
             <div className="text-center py-12">
-              <p className="text-xl">❌ {error}</p>
-              <p className="mt-2 text-sm opacity-80">请刷新页面重试</p>
+              <p className="text-[18px] font-semibold">❌ {error}</p>
+              <p className="mt-2 text-[18px] font-semibold opacity-80">请刷新页面重试</p>
             </div>
           ) : weather ? (
             <div>
@@ -136,7 +144,7 @@ export default function Home() {
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                 </svg>
-                <h1 className="text-2xl font-semibold">上海</h1>
+                <h1 className="text-[18px] font-semibold">上海</h1>
               </div>
 
               {/* 主要天气信息 */}
@@ -147,12 +155,12 @@ export default function Home() {
                 </div>
 
                 {/* 温度 */}
-                <div className="text-7xl font-light mb-3">
+                <div className="text-[72px] font-black mb-3 tracking-tight" style={{ letterSpacing: '-2px' }}>
                   {Math.round(weather.current.temperature_2m)}°
                 </div>
 
                 {/* 天气状况 */}
-                <div className="text-xl font-normal">
+                <div className="text-[18px] font-semibold">
                   {getWeatherDescription(weather.current.weather_code)}
                 </div>
               </div>
@@ -165,7 +173,7 @@ export default function Home() {
                   <div className="text-2xl font-bold mb-1">
                     {weather.current.relative_humidity_2m}%
                   </div>
-                  <div className="text-xs opacity-80">湿度</div>
+                  <div className="text-[18px] font-semibold opacity-80">湿度</div>
                 </div>
 
                 {/* 风速 */}
@@ -174,7 +182,7 @@ export default function Home() {
                   <div className="text-2xl font-bold mb-1">
                     {getWindLevel(weather.current.wind_speed_10m)}级
                   </div>
-                  <div className="text-xs opacity-80">{getWindDirection(weather.current.wind_direction_10m)}</div>
+                  <div className="text-[18px] font-semibold opacity-80">{getWindDirection(weather.current.wind_direction_10m)}</div>
                 </div>
 
                 {/* 紫外线 */}
@@ -183,9 +191,26 @@ export default function Home() {
                   <div className="text-2xl font-bold mb-1">
                     {getUVLevel(weather.current.uv_index)}
                   </div>
-                  <div className="text-xs opacity-80">紫外线</div>
+                  <div className="text-[18px] font-semibold opacity-80">紫外线</div>
                 </div>
               </div>
+
+              {/* 雨滴动画（当下雨时显示） */}
+              {isRainy(weather.current.weather_code) && (
+                <div className="absolute inset-0 overflow-hidden rounded-[16px] pointer-events-none">
+                  {Array.from({ length: 60 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="absolute w-0.5 h-3 bg-white/40 rounded-full"
+                      style={{
+                        left: `${Math.random() * 100}%`,
+                        animation: `rain ${0.5 + Math.random() * 0.5}s linear infinite`,
+                        animationDelay: `${Math.random() * 2}s`,
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           ) : null}
         </div>
