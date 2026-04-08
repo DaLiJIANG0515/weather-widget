@@ -1,9 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Inter from 'next/font/google'
+import { Inter } from 'next/font/google'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  weight: ['400', '600', '900']
+})
 
 interface WeatherData {
   current: {
