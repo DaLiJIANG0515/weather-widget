@@ -133,7 +133,9 @@ export default function Home() {
         <div className="rounded-[16px] shadow-2xl p-[32px] text-white relative overflow-hidden" style={{
           width: '400px',
           height: '400px',
-          background: `linear-gradient(to bottom, #3A3D35 0%, #2D3028 33%, #1E211A 66%, #1C1F17 100%)`
+          backgroundImage: "url('/background.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
         }}>
           {loading ? (
             <div className="text-center py-12">
