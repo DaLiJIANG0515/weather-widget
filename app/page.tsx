@@ -8,13 +8,14 @@ interface WeatherData {
     relative_humidity_2m: number
     weather_code: number
     wind_speed_10m: number
+    wind_direction_10m: number
     uv_index: number
   }
 }
 
 function getWeatherDescription(code: number): string {
   const weatherCodes: { [key: number]: string } = {
-    0: '晴',
+    0: '晴朗',
     1: '多云',
     2: '多云',
     3: '阴',
@@ -39,6 +40,48 @@ function getWeatherDescription(code: number): string {
   return weatherCodes[code] || '未知'
 }
 
+function getWeatherIcon(code: number): string {
+  if (code === 0) return '☀️' // 晴
+  if (code >= 1 && code <= 3) return '⛅' // 多云/阴
+  if (code >= 45 && code <= 48) return '🌫️' // 雾
+  if (code >= 51 && code <= 55) return '🌧️' // 小雨
+  if (code >= 61 && code <= 65) return '🌧️' // 雨
+  if (code >= 71 && code <= 75) return '❄️' // 雪
+  if (code >= 80 && code <= 82) return '🌦️' // 阵雨
+  if (code >= 95 && code <= 99) return '⛈️' // 雷阵雨
+  return '☀️'
+}
+
+function getWindDirection(degree: number): string {
+  const directions = ['北风', '东北风', '东风', '东南风', '南风', '西南风', '西风', '西北风']
+  return directions[Math.round(degree / 45) % 8]
+}
+
+function getWindLevel(speed: number): number {
+  // 风速 km/h 转换为风级
+  if (speed < 1) return 0
+  if (speed < 6) return 1
+  if (speed < 12) return 2
+  if (speed < 20) return 3
+  if (speed < 29) return 4
+  if (speed < 39) return 5
+  if (speed < 50) return 6
+  if (speed < 62) return 7
+  if (speed < 75) return 8
+  if (speed < 89) return 9
+  if (speed < 103) return 10
+  if (speed < 117) return 11
+  return 12
+}
+
+function getUVLevel(uv: number): string {
+  if (uv <= 2) return '弱'
+  if (uv <= 5) return '中等'
+  if (uv <= 7) return '强'
+  if (uv <= 10) return '很强'
+  return '极强'
+}
+
 export default function Home() {
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -52,7 +95,7 @@ export default function Home() {
         const lon = 121.4737
 
         const response = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,uv_index&timezone=auto`
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index&timezone=Asia/Shanghai`
         )
 
         if (!response.ok) {
@@ -72,7 +115,7 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-400 to-blue-600 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600 p-4">
       <div className="w-full max-w-md">
         {/* 天气卡片 */}
         <div className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl shadow-2xl p-8 text-white">
@@ -89,39 +132,58 @@ export default function Home() {
           ) : weather ? (
             <div>
               {/* 城市名称 */}
-              <div className="text-center mb-8">
-                <h1 className="text-3xl font-semibold">上海</h1>
+              <div className="flex items-center justify-center mb-8">
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                </svg>
+                <h1 className="text-2xl font-semibold">上海</h1>
               </div>
 
               {/* 主要天气信息 */}
               <div className="text-center mb-8">
-                <div className="text-8xl font-light mb-4">
+                {/* 天气图标 */}
+                <div className="text-7xl mb-4">
+                  {getWeatherIcon(weather.current.weather_code)}
+                </div>
+
+                {/* 温度 */}
+                <div className="text-7xl font-light mb-3">
                   {Math.round(weather.current.temperature_2m)}°
                 </div>
-                <div className="text-2xl font-normal">
+
+                {/* 天气状况 */}
+                <div className="text-xl font-normal">
                   {getWeatherDescription(weather.current.weather_code)}
                 </div>
               </div>
 
               {/* 详细信息 */}
               <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <div className="text-xs opacity-80 mb-1">湿度</div>
-                  <div className="text-xl font-semibold">
+                {/* 湿度 */}
+                <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+                  <div className="text-3xl mb-1">💧</div>
+                  <div className="text-2xl font-bold mb-1">
                     {weather.current.relative_humidity_2m}%
                   </div>
+                  <div className="text-xs opacity-80">湿度</div>
                 </div>
-                <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <div className="text-xs opacity-80 mb-1">风速</div>
-                  <div className="text-xl font-semibold">
-                    {Math.round(weather.current.wind_speed_10m)} km/h
+
+                {/* 风速 */}
+                <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+                  <div className="text-3xl mb-1">🌬️</div>
+                  <div className="text-2xl font-bold mb-1">
+                    {getWindLevel(weather.current.wind_speed_10m)}级
                   </div>
+                  <div className="text-xs opacity-80">{getWindDirection(weather.current.wind_direction_10m)}</div>
                 </div>
-                <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <div className="text-xs opacity-80 mb-1">紫外线</div>
-                  <div className="text-xl font-semibold">
-                    {Math.round(weather.current.uv_index)}
+
+                {/* 紫外线 */}
+                <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+                  <div className="text-3xl mb-1">☀️</div>
+                  <div className="text-2xl font-bold mb-1">
+                    {getUVLevel(weather.current.uv_index)}
                   </div>
+                  <div className="text-xs opacity-80">紫外线</div>
                 </div>
               </div>
             </div>
