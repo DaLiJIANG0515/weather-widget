@@ -151,19 +151,11 @@ export default function Home() {
             <div>
               {/* 城市名称 */}
               <div className="flex items-center justify-center mb-8">
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                </svg>
                 <h1 className="text-[18px] font-semibold">上海</h1>
               </div>
 
               {/* 主要天气信息 */}
               <div className="text-center mb-8">
-                {/* 天气图标 */}
-                <div className="text-7xl mb-4">
-                  {getWeatherIcon(weather.current.weather_code)}
-                </div>
-
                 {/* 温度 */}
                 <div className="text-[72px] font-black mb-3 tracking-tight" style={{ letterSpacing: '-2px' }}>
                   {Math.round(weather.current.temperature_2m)}°
@@ -179,7 +171,6 @@ export default function Home() {
               <div className="grid grid-cols-3 gap-4 text-center">
                 {/* 湿度 */}
                 <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                  <div className="text-3xl mb-1">💧</div>
                   <div className="text-2xl font-bold mb-1">
                     {weather.current.relative_humidity_2m}%
                   </div>
@@ -188,7 +179,6 @@ export default function Home() {
 
                 {/* 风速 */}
                 <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                  <div className="text-3xl mb-1">🌬️</div>
                   <div className="text-2xl font-bold mb-1">
                     {getWindLevel(weather.current.wind_speed_10m)}级
                   </div>
@@ -197,7 +187,6 @@ export default function Home() {
 
                 {/* 紫外线 */}
                 <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                  <div className="text-3xl mb-1">☀️</div>
                   <div className="text-2xl font-bold mb-1">
                     {getUVLevel(weather.current.uv_index)}
                   </div>
